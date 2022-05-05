@@ -21,7 +21,7 @@ const App = () => {
   const [user, setUser] = useState('jessica');
   const [inside, setInside] = useState({});
   const [outside, setOutside] = useState({});
-  const [bet, setBet] = useState(10);
+  const [bet, setBet] = useState(50);
   const [balance, setBalance] = useState(100000);
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
@@ -113,12 +113,16 @@ const App = () => {
         </Container>
         <Paper styles={{ textAlign: 'center'}}>
           <Tabs variant={'fullWidth'} value={bet} onChange={handleChange} centered>
-            <Tab value={50} icon={<PaidTwoToneIcon />} label="50" />
-            <Tab value={250} icon={<PaidTwoToneIcon />} label="250" />
-            <Tab value={500} icon={<PaidTwoToneIcon />} label="500" />
-            <Tab value={1000} icon={<PaidTwoToneIcon />} label="1000" />
+            <Tab value={50} icon={<PaidTwoToneIcon />} label="$50" />
+            <Tab value={250} icon={<PaidTwoToneIcon />} label="$250" />
+            <Tab value={500} icon={<PaidTwoToneIcon />} label="$500" />
+            <Tab value={1000} icon={<PaidTwoToneIcon />} label="$1000" />
           </Tabs>
         </Paper>
+        <Box styles={{ textAlign: 'center'}}>
+          <Button variant="contained" onClick={sendNumber} sx={{ m: 1 }}>send state</Button>
+          <Button variant="contained" onClick={sendRoll} sx={{ m: 1 }}>roll</Button>
+        </Box>
       </Grid>
     </Grid>
   )

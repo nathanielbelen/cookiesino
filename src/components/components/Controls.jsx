@@ -30,27 +30,17 @@ const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, insi
   };
 
   return (
-    <Stack spacing={3}>
-      <Box styles={{ textAlign: 'center'}}>
-        <Button variant="contained" onClick={sendNumber} sx={{ m: 1 }}>send state</Button>
-        <Button variant="contained" onClick={sendRoll} sx={{ m: 1 }}>roll</Button>
-      </Box>
+    <Stack spacing={2}>
       <Paper styles={{ textAlign: 'center'}}>
-          <Tabs variant={'fullWidth'} value={bet} onChange={handleChange} centered>
-            <Tab value={50} icon={<PaidTwoToneIcon />} label="50" />
-            <Tab value={250} icon={<PaidTwoToneIcon />} label="250" />
-            <Tab value={500} icon={<PaidTwoToneIcon />} label="500" />
-            <Tab value={1000} icon={<PaidTwoToneIcon />} label="1000" />
-          </Tabs>
+        <Box sx={{ height: '30vh' }}></Box>
       </Paper>
-      <Paper styles={{ textAlign: 'center'}}>
-        <Typography variant='h3'>Current bets: </Typography>
-        <Avatar>J</Avatar>
-        <Typography variant='h6'>{user}</Typography>
+      <Paper styles={{ textAlign: 'center' }}>
+        <Box sx={{ height: '30vh' }}>
+          <Typography variant='h3'>Current bets: </Typography>
+          <Avatar>J</Avatar>
+          <Typography variant='h6'>{user}</Typography>
+        </Box>
       </Paper>
-      <Box>
-        <Button fullWidth size='large' color='primary' variant='outlined' sx={{ height: 100 }}>SUBMIT BET</Button>
-      </Box>
       <Box styles={{ textAlign: 'center'}}>
         <Card>
           <CardContent style={{ textAlign: 'center' }}>
@@ -62,6 +52,9 @@ const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, insi
             <Button size="small">ADD BALANCE</Button>
           </CardActions>
         </Card>
+      </Box>
+      <Box>
+        <Button fullWidth size='large' color='primary' variant='outlined' sx={{ height: 100 }}>SUBMIT BET</Button>
       </Box>
     </Stack>
   )
