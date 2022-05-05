@@ -12,6 +12,9 @@ import Paper from '@mui/material/Paper';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import PaidTwoToneIcon from '@mui/icons-material/PaidTwoTone';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import CheckIcon from '@mui/icons-material/Check';
 
 const client = new W3CWebSocket('ws://localhost:8080');
 client.binaryType = "arraybuffer";
@@ -22,10 +25,15 @@ const App = () => {
   const [inside, setInside] = useState({});
   const [outside, setOutside] = useState({});
   const [bet, setBet] = useState(50);
+  const [bets, setBets] = useState([]);
   const [balance, setBalance] = useState(100000);
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
   const [winnings, setWinnings] = useState(0);
+  const [displayWin, setDisplayWin] = useState(false);
+  const [displayLoss, setDisplayLoss] = useState(false);
+  const [displayWait, setDisplayWait] = useState(false);
+  const [displayAmount, setDisplayAmount] = useState(0);
 
   useEffect(() => {
     console.log(`inside changed to be ${inside}!`)
@@ -34,6 +42,10 @@ const App = () => {
   useEffect(() => {
     console.log(`inside changed to be ${outside}!`)
   }, [outside])
+
+  useEffect(() => {
+    console.log(bets)
+  }, [bets])
 
   useEffect(() => {
     client.onopen = () => {
@@ -46,7 +58,12 @@ const App = () => {
         setPrizeNumber(messageParse.roll)
         if (messageParse.winnings > 0) {
           setWinnings(messageParse.winnings)
+        } else {
+          setTimeout(() => {
+            setDisplayLoss(true);
+          }, 2000)
         }
+        setBets([]);
         setMustSpin(true);
         setInside({})
         setOutside({})
@@ -59,10 +76,29 @@ const App = () => {
   useEffect(() => {
     setTimeout(() => {
       console.log(`congrats YOU WON ${winnings}`)
+      setDisplayAmount(winnings);
       setBalance(balance + winnings);
       setWinnings(0);
     }, 2000)
   }, [winnings])
+
+  useEffect(() => {
+    if (displayAmount !== 0) {
+      setDisplayWin(true);
+      setTimeout(() => {
+        setDisplayWin(false);
+        setDisplayAmount(0);
+      }, 5000)
+    }
+  }, [displayAmount])
+
+  useEffect(() => {
+    if (displayLoss === true) {
+      setTimeout(() => {
+        setDisplayLoss(false);
+      }, 5000)
+    }
+  }, [displayLoss])
 
   const sendNumber = () => {
     let total = 0;
@@ -79,16 +115,18 @@ const App = () => {
       outside: outside
     }
     let balanceCopy = balance
+    setDisplayWait(true);
     setBalance(balanceCopy - total);
-    console.log(bet);
+    console.log(JSON.stringify(bet));
     client.send(JSON.stringify({ message: bet, type: 'bet', from: user }));
   }
 
   const sendRoll = () => {
-    console.log({
+    console.log(({
       inside: inside,
       outside: outside
-    })
+    }))
+    setDisplayWait(false);
     client.send(JSON.stringify({ message: 'roll', type: 'roll', from: user }))
   }
 
@@ -98,9 +136,9 @@ const App = () => {
   };
 
   return (
-    <Grid container spacing={0} columns={3} columnSpacing={0} padding style={{ padding: 20 }}>
+    <Grid container spacing={0} columns={3} columnSpacing={2} style={{ padding: 20 }}>
       <Grid item xs={1} fixed>
-        <Controls user={user} setUser={setUser} bet={bet} setBet={setBet} sendNumber={sendNumber} sendRoll={sendRoll} setBalance={setBalance} balance={balance} inside={inside} outside={outside}/>
+        <Controls user={user} setUser={setUser} bet={bet} setBet={setBet} sendNumber={sendNumber} sendRoll={sendRoll} setBalance={setBalance} balance={balance} inside={inside} outside={outside} bets={bets}/>
       </Grid>
       <Grid item xs={2} fixed>
         <Container>
@@ -109,7 +147,7 @@ const App = () => {
           </Box>
         </Container>
         <Container>
-          <RouletteBoard setInside={setInside} setOutside={setOutside} inside={inside} outside={outside} bet={bet}/>
+          <RouletteBoard setInside={setInside} setOutside={setOutside} inside={inside} outside={outside} bet={bet} bets={bets} setBets={setBets}/>
         </Container>
         <Paper styles={{ textAlign: 'center'}}>
           <Tabs variant={'fullWidth'} value={bet} onChange={handleChange} centered>
@@ -119,10 +157,30 @@ const App = () => {
             <Tab value={1000} icon={<PaidTwoToneIcon />} label="$1000" />
           </Tabs>
         </Paper>
-        <Box styles={{ textAlign: 'center'}}>
-          <Button variant="contained" onClick={sendNumber} sx={{ m: 1 }}>send state</Button>
-          <Button variant="contained" onClick={sendRoll} sx={{ m: 1 }}>roll</Button>
-        </Box>
+        {displayWin ?
+          (
+            <Alert severity="success">
+              <AlertTitle>Congratulations!</AlertTitle>
+              You won ${displayAmount}.00!
+            </Alert>
+          ) : null
+        }
+        {displayLoss ?
+          (
+            <Alert severity="error">
+              <AlertTitle>Sorry</AlertTitle>
+              No winning conditions pulled.
+            </Alert>
+          ) : null
+        }
+        {displayWait ?
+          (
+            <Alert severity="info">
+              <AlertTitle>Waiting</AlertTitle>
+              Currently waiting for next roll.
+            </Alert>
+          ) : null
+        }
       </Grid>
     </Grid>
   )

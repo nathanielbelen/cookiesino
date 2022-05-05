@@ -4,22 +4,26 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Grid, { Item } from '@mui/material/Grid';
 
-const RouletteBoard = ({ inside, setInside, outside, setOutside, bet }) => {
+const RouletteBoard = ({ inside, setInside, outside, setOutside, bet, bets, setBets }) => {
 
   const insideOnClick = (e) => {
     let newInside = { ...inside };
+    let newBets = [...bets, [e.target.value, bet]]
     newInside[e.target.value] = bet;
     setInside(newInside);
+    setBets(newBets)
     console.log('we clickin inside')
   }
 
   const outsideOnClick = (e) => {
     let newOutside = { ...outside };
+    let newBets = [...bets, [e.target.value, bet]]
     let obj = {};
     obj[e.target.value] = bet;
     newOutside[e.target.title] = obj
     console.log('we clickin outside')
     setOutside(newOutside);
+    setBets(newBets);
   }
 
   return (

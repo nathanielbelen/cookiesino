@@ -18,11 +18,24 @@ import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 
+
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, inside, outside, user, setUser }) => {
+const Bet = ({ name, amount }) => {
+  return (
+  <Paper sx={{ m: '3px', height: 60, width: 60, verticalAlign: 'bottom', display: 'table-cell'}}>
+    <Box sx={{ position: "relative", textAlign: 'center' }}>
+      <Typography variant='button'>{name}</Typography>
+    </Box>
+    <Box sx={{ textAlign: 'center' }}>
+      <Typography variant='overline'>${amount}</Typography>
+    </Box>
+  </Paper>)
+}
+
+const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, inside, outside, user, setUser, bets }) => {
 
   const handleChange = (e, newValue) => {
     setBet(newValue)
@@ -32,13 +45,11 @@ const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, insi
   return (
     <Stack spacing={2}>
       <Paper styles={{ textAlign: 'center'}}>
-        <Box sx={{ height: '30vh' }}></Box>
+        <Box sx={{ height: '40vh' }}></Box>
       </Paper>
-      <Paper styles={{ textAlign: 'center' }}>
-        <Box sx={{ height: '30vh' }}>
-          <Typography variant='h3'>Current bets: </Typography>
-          <Avatar>J</Avatar>
-          <Typography variant='h6'>{user}</Typography>
+      <Paper styles={{ textAlign: 'center', pt: 2 }}>
+        <Box sx={{ height: '18vh', padding: 2, display: 'flex', flexWrap: 'wrap' }}>
+          {bets.map((bet, index) => <Bet name={bet[0]} amount={bet[1]} />)}
         </Box>
       </Paper>
       <Box styles={{ textAlign: 'center'}}>
@@ -48,13 +59,14 @@ const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, insi
               ${numberWithCommas(balance)}.00
             </Typography>
           </CardContent>
-          <CardActions>
+          <CardActions style={{ justifyContent: "space-between" }}>
             <Button size="small">ADD BALANCE</Button>
+            <Avatar onClick={sendRoll}>J</Avatar>
           </CardActions>
         </Card>
       </Box>
       <Box>
-        <Button fullWidth size='large' color='primary' variant='outlined' sx={{ height: 100 }}>SUBMIT BET</Button>
+        <Button fullWidth onClick={sendNumber} size='large' color='primary' variant='outlined' sx={{ height: 100 }}>SUBMIT BET</Button>
       </Box>
     </Stack>
   )
