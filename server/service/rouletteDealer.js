@@ -86,27 +86,39 @@ wss.on('connection', function connection(ws) {
     let messageObj = JSON.parse(data);
     console.log(messageObj);
     if (messageObj.type === 'bet') {
-      bets[messageObj.from] = messageObj.message
+      bets[messageObj.user] = messageObj.message
       console.log(bets);
     }
     if (messageObj.type === 'roll') {
       roll();
       processWinners();
+      console.log(payouts)
       // finalizeWinnings();
       // temporary for MVP below
       // ws.send((JSON.stringify({winnings: payWinner(messageObj.from), roll: currentRoll.index})));
       wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
-          client.send((JSON.stringify({winnings: payWinner(messageObj.from), roll: currentRoll.index})));
+          client.send(JSON.stringify({winnings: payouts, roll: currentRoll.index}));
+          if (payouts[messageObj.user]) {
+            client.send(JSON.stringify({ type: 'winner', text: `just won ${payouts[messageObj.user]}!`, user: messageObj.user }
+            ));
+          }
         }
       });
       bets = {};
       payouts = {};
       currentRoll = {};
     }
+    if (messageObj.type === 'message') {
+      wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(messageObj.message);
+        }
+      });
+    }
   });
 
-  ws.send((JSON.stringify({message: 'connected!'})));
+  ws.send(JSON.stringify({type: 'message', user:'system', text: 'welcome to ouronlygameisroulette.com'}));
 });
 
 wss.broadcast = function(data) {

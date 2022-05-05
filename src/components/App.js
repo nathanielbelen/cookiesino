@@ -49,6 +49,13 @@ const theme = createTheme({
   },
 });
 
+/*
+  const [messages, setMessages] = useState([
+    { type: 'winner', user: 'jessica', text: 1000 },
+    { type: 'message', user: 'nathaniel', text: "SHEEEEEEEEEEESH" },
+  ]);
+*/
+
 const App = () => {
   const [connected, setConnected] = useState(true);
   const [user, setUser] = useState('jessica');
@@ -64,6 +71,14 @@ const App = () => {
   const [displayLoss, setDisplayLoss] = useState(false);
   const [displayWait, setDisplayWait] = useState(false);
   const [displayAmount, setDisplayAmount] = useState(0);
+  const [newMessage, setNewMessage] = useState(null);
+  const [messages, setMessages] = useState([]);
+
+  const changeTo = (user) => {
+    setUser(user);
+  }
+
+  window.changeTo = changeTo
 
   useEffect(() => {
     console.log(`inside changed to be ${inside}!`)
@@ -84,21 +99,27 @@ const App = () => {
     };
     client.onmessage = (message) => {
       let messageParse = JSON.parse(message.data);
-      if (!messageParse.message) {
+      console.log('START MESSAGE')
+      console.log(messageParse)
+      console.log('END MESSAGE')
+      if (messageParse.type !== 'message' && messageParse.type !== 'winner') {
         setPrizeNumber(messageParse.roll)
-        if (messageParse.winnings > 0) {
-          setWinnings(messageParse.winnings)
-        } else {
-          setTimeout(() => {
-            setDisplayLoss(true);
-          }, 2000)
+        if (messageParse.winnings[user]) {
+          if (messageParse.winnings[user] > 0) {
+            setWinnings(messageParse.winnings[user])
+          } else {
+            setTimeout(() => {
+              setDisplayLoss(true);
+            }, 2000)
+          }
         }
         setBets([]);
         setMustSpin(true);
         setInside({})
         setOutside({})
       } else {
-        console.log(messageParse.message)
+        console.log('messageParse.message', messageParse)
+        setNewMessage(messageParse)
       }
     };
   }, [])
@@ -132,6 +153,13 @@ const App = () => {
     }
   }, [displayLoss])
 
+  useEffect(() => {
+    if (newMessage !== null) {
+      setMessages([...messages, newMessage])
+    }
+    console.log(messages)
+  }, [newMessage])
+
   const sendNumber = () => {
     let total = 0;
     for (let key in inside) {
@@ -150,7 +178,7 @@ const App = () => {
     setDisplayWait(true);
     setBalance(balanceCopy - total);
     console.log(JSON.stringify(bet));
-    client.send(JSON.stringify({ message: bet, type: 'bet', from: user }));
+    client.send(JSON.stringify({ message: bet, type: 'bet', user: user }));
   }
 
   const sendRoll = () => {
@@ -159,7 +187,7 @@ const App = () => {
       outside: outside
     }))
     setDisplayWait(false);
-    client.send(JSON.stringify({ message: 'roll', type: 'roll', from: user }))
+    client.send(JSON.stringify({ message: 'roll', type: 'roll', user: user }))
   }
 
   const handleChange = (e, newValue) => {
@@ -167,11 +195,15 @@ const App = () => {
     console.log('value', newValue)
   };
 
+  const sendMessage = (message) => {
+    client.send(JSON.stringify({ message: message, type: 'message', user: user }))
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <Grid container spacing={0} columns={3} columnSpacing={2} style={{ padding: 20 }} sx={{ bgcolor: '#e2e4f0' }}>
         <Grid item xs={1} fixed>
-          <Controls user={user} setUser={setUser} bet={bet} setBet={setBet} sendNumber={sendNumber} sendRoll={sendRoll} setBalance={setBalance} balance={balance} inside={inside} outside={outside} bets={bets}/>
+          <Controls user={user} setUser={setUser} bet={bet} setBet={setBet} sendNumber={sendNumber} sendRoll={sendRoll} setBalance={setBalance} balance={balance} inside={inside} outside={outside} bets={bets} messages={messages} sendMessage={sendMessage} />
         </Grid>
         <Grid item xs={2} fixed sx={{ m: 0 }}>
           <Container>

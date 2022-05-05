@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -17,6 +17,9 @@ import Avatar from '@mui/material/Avatar';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import TextField from '@mui/material/TextField';
 
 
 function numberWithCommas(x) {
@@ -35,17 +38,55 @@ const Bet = ({ name, amount }) => {
   </Paper>)
 }
 
-const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, inside, outside, user, setUser, bets }) => {
+const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, inside, outside, user, setUser, bets, messages, sendMessage }) => {
 
-  const handleChange = (e, newValue) => {
-    setBet(newValue)
-    console.log('value', newValue)
+  const [message, setMessage] = useState('');
+  // const [messagesA, setMessagesA] = useState('');
+
+  const handleChange = (e) => {
+    setMessage(e.target.value)
   };
+
+  // const handleText = (e) => {
+  //   setMessage(e.target.value);
+  //   console.log(message)
+  // }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    sendMessage(JSON.stringify({ text: message, type: 'message', user: user }))
+    setMessage('')
+  }
+
+  let messagesEnd;
 
   return (
     <Stack spacing={2}>
       <Paper styles={{ textAlign: 'center'}}>
-        <Box sx={{ height: '40vh' }}></Box>
+        <Box sx={{ height: '40vh', overflow: 'auto' }} component="div">
+          {messages.map((message, index) => {
+            if (message.type === 'message') {
+              return (
+                <Alert severity="info">
+                  <AlertTitle>{message.user}</AlertTitle>
+                  {message.text}
+                </Alert>
+              )
+            } else if (message.type === 'winner') {
+              return (
+                <Alert severity="success">{message.user} {message.text}!</Alert>
+              )
+            }
+          })}
+          <div style={{ float:"left", clear: "both" }}
+             ref={(el) => { messagesEnd = el; }}>
+          </div>
+        </Box>
+        <Box>
+          <form onSubmit={handleSubmit}>
+            <TextField autoComplete="new-password" id="standard-basic" variant="outlined" fullWidth value={message} onChange={handleChange}/>
+          </form>
+        </Box>
       </Paper>
       <Paper styles={{ textAlign: 'center', pt: 2 }}>
         <Box sx={{ height: '18vh', padding: 2, display: 'flex', flexWrap: 'wrap' }}>
@@ -61,7 +102,7 @@ const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, insi
           </CardContent>
           <CardActions style={{ justifyContent: "space-between" }}>
             <Button size="small">ADD BALANCE</Button>
-            <Avatar onClick={sendRoll}>J</Avatar>
+            <Avatar onClick={sendRoll}>{user.substring(0, 1)}</Avatar>
           </CardActions>
         </Card>
       </Box>
