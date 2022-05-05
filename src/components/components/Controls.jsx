@@ -66,7 +66,7 @@ const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, insi
         </Card>
       </Box>
       <Box>
-        <Button fullWidth onClick={sendNumber} size='large' color='primary' variant='outlined' sx={{ height: 100 }}>SUBMIT BET</Button>
+        <Button fullWidth onClick={sendNumber} size='large' color='primary' variant='contained' sx={{ height: 100 }}>SUBMIT BET</Button>
       </Box>
     </Stack>
   )

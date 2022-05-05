@@ -95,7 +95,6 @@ wss.on('connection', function connection(ws) {
       // finalizeWinnings();
       // temporary for MVP below
       // ws.send((JSON.stringify({winnings: payWinner(messageObj.from), roll: currentRoll.index})));
-      console.log(wss.clients)
       wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
           client.send((JSON.stringify({winnings: payWinner(messageObj.from), roll: currentRoll.index})));
