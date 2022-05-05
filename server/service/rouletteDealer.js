@@ -4,6 +4,7 @@
 // why did I loop through objects like that lol refactor to use for-in loop
 
 const WebSocketServer = require('ws').WebSocketServer;
+const WebSocket = require('ws')
 const data = require('./data.js');
 const { multipliers, numbers, characteristics } = data;
 
@@ -93,7 +94,13 @@ wss.on('connection', function connection(ws) {
       processWinners();
       // finalizeWinnings();
       // temporary for MVP below
-      ws.send((JSON.stringify({winnings: payWinner(messageObj.from), roll: currentRoll.index})));
+      // ws.send((JSON.stringify({winnings: payWinner(messageObj.from), roll: currentRoll.index})));
+      console.log(wss.clients)
+      wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send((JSON.stringify({winnings: payWinner(messageObj.from), roll: currentRoll.index})));
+        }
+      });
       bets = {};
       payouts = {};
       currentRoll = {};
@@ -103,7 +110,9 @@ wss.on('connection', function connection(ws) {
   ws.send((JSON.stringify({message: 'connected!'})));
 });
 
-
+wss.broadcast = function(data) {
+  wss.clients.forEach(client => client.send(data));
+};
 
 // roll();
 // processWinners();
