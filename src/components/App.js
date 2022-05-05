@@ -49,16 +49,9 @@ const theme = createTheme({
   },
 });
 
-/*
-  const [messages, setMessages] = useState([
-    { type: 'winner', user: 'jessica', text: 1000 },
-    { type: 'message', user: 'nathaniel', text: "SHEEEEEEEEEEESH" },
-  ]);
-*/
-
 const App = () => {
   const [connected, setConnected] = useState(true);
-  const [user, setUser] = useState('jessica');
+  const [user, setUser] = useState('JulianForDBPresident');
   const [inside, setInside] = useState({});
   const [outside, setOutside] = useState({});
   const [bet, setBet] = useState(50);
