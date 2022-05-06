@@ -1,2 +1,2 @@
 # ouronlygameisroulette
-![image](ouronlygameisroulette.png)
+![image](ouronlygameisroulette.small.png)
