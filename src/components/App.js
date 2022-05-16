@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import RouletteBoard from './components/RouletteBoard.jsx'
 import Controls from './components/Controls.jsx';
@@ -49,14 +49,14 @@ const theme = createTheme({
   },
 });
 
-const App = () => {
+const App = ({ myUser, myBalance }) => {
   const [connected, setConnected] = useState(true);
-  const [user, setUser] = useState('JulianForDBPresident');
+  const [user, setUser] = useState(myUser);
   const [inside, setInside] = useState({});
   const [outside, setOutside] = useState({});
   const [bet, setBet] = useState(50);
   const [bets, setBets] = useState([]);
-  const [balance, setBalance] = useState(100000);
+  const [balance, setBalance] = useState(myBalance);
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
   const [winnings, setWinnings] = useState(0);
@@ -95,16 +95,25 @@ const App = () => {
       console.log('START MESSAGE')
       console.log(messageParse)
       console.log('END MESSAGE')
-      if (messageParse.type !== 'message' && messageParse.type !== 'winner') {
+      if (messageParse.type !== 'message') {
         setPrizeNumber(messageParse.roll)
+        console.log(messageParse)
+        for (let winner in messageParse.winnings) {
+          if (winner !== user) {
+            setTimeout(() => {
+              setNewMessage({ text: `just won $${messageParse.winnings[winner]}!`, type: 'winner', user: `${winner}`})
+            }, 2000)
+          }
+        }
         if (messageParse.winnings[user]) {
           if (messageParse.winnings[user] > 0) {
             setWinnings(messageParse.winnings[user])
-          } else {
-            setTimeout(() => {
-              setDisplayLoss(true);
-            }, 2000)
           }
+        } else {
+          console.log('we hit a loss and this is running')
+          setTimeout(() => {
+            setDisplayLoss(true);
+          }, 2000)
         }
         setBets([]);
         setMustSpin(true);
@@ -209,10 +218,12 @@ const App = () => {
           </Container>
           <Paper styles={{ textAlign: 'center'}}>
             <Tabs variant={'fullWidth'} value={bet} onChange={handleChange} centered>
+            <Tab value={10000} icon={<PaidTwoToneIcon />} label="$10,000" />
+            <Tab value={5000} icon={<PaidTwoToneIcon />} label="$5,000" />
+            <Tab value={1000} icon={<PaidTwoToneIcon />} label="$1,000" />
+            <Tab value={500} icon={<PaidTwoToneIcon />} label="$500" />
+            <Tab value={250} icon={<PaidTwoToneIcon />} label="$250" />
               <Tab value={50} icon={<PaidTwoToneIcon />} label="$50" />
-              <Tab value={250} icon={<PaidTwoToneIcon />} label="$250" />
-              <Tab value={500} icon={<PaidTwoToneIcon />} label="$500" />
-              <Tab value={1000} icon={<PaidTwoToneIcon />} label="$1000" />
             </Tabs>
           </Paper>
           {displayWin ?

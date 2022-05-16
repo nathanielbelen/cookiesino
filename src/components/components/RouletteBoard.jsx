@@ -61,7 +61,11 @@ const RouletteBoard = ({ inside, setInside, outside, setOutside, bet, bets, setB
     let newBets = [...bets, [e.target.value, bet]]
     let obj = {};
     obj[e.target.value] = bet;
-    newOutside[e.target.title] = obj
+    if (!newOutside[e.target.title]) {
+      newOutside[e.target.title] = obj
+    } else {
+      newOutside[e.target.title][e.target.value] = bet
+    }
     console.log('we clickin outside')
     setOutside(newOutside);
     setBets(newBets);

@@ -52,33 +52,11 @@ const processWinners = () => {
   let bettors = Object.keys(bets);
   for (let i = 0; i < bettors.length; i++) {
     let bettor = bettors[i];
-    //process every bettor
     let winnings = gatherWinnings(bets[bettor]);
     if (winnings) {
       payouts[bettor] = winnings;
     }
   }
-}
-
-const payWinner = (winner) => {
-  let amount = payouts[winner] || 0;
-  console.log(`this will query db to add ${amount} to ${winner}'s account`)
-  return amount;
-}
-
-const finalizeWinnings = () => {
-  let winners = Object.keys(payouts);
-  if (winners.length === 0) {
-    console.log('no winners sorry!')
-  } else {
-    for (let i = 0; i < winners.length; i++) {
-      let winner = winners[i];
-      payWinner(winner)
-    }
-  }
-  bets = {};
-  payouts = {};
-  currentRoll = {};
 }
 
 wss.on('connection', function connection(ws) {
@@ -93,16 +71,9 @@ wss.on('connection', function connection(ws) {
       roll();
       processWinners();
       console.log(payouts)
-      // finalizeWinnings();
-      // temporary for MVP below
-      // ws.send((JSON.stringify({winnings: payWinner(messageObj.from), roll: currentRoll.index})));
       wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify({winnings: payouts, roll: currentRoll.index}));
-          if (payouts[messageObj.user]) {
-            client.send(JSON.stringify({ type: 'winner', text: `just won ${payouts[messageObj.user]}!`, user: messageObj.user }
-            ));
-          }
         }
       });
       bets = {};
@@ -118,7 +89,7 @@ wss.on('connection', function connection(ws) {
     }
   });
 
-  ws.send(JSON.stringify({type: 'message', user:'system', text: 'welcome to ouronlygameisroulette.com'}));
+  // ws.send(JSON.stringify({type: 'message', user:'system', text: 'welcome to ouronlygameisroulette.com'}));
 });
 
 wss.broadcast = function(data) {

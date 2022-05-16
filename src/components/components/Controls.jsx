@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -43,6 +43,19 @@ const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, insi
   const [message, setMessage] = useState('');
   // const [messagesA, setMessagesA] = useState('');
 
+  const chatContainer = useRef();
+
+  const scrollToMyRef = () => {
+    const scroll =
+      chatContainer.current.scrollHeight -
+      chatContainer.current.clientHeight;
+    chatContainer.current.scrollTo(0, scroll);
+  };
+
+  useEffect(() => {
+    scrollToMyRef();
+  }, [messages])
+
   const handleChange = (e) => {
     setMessage(e.target.value)
   };
@@ -63,18 +76,27 @@ const Controls = ({ sendNumber, sendRoll, setBalance, balance, setBet, bet, insi
   return (
     <Stack spacing={2}>
       <Paper styles={{ textAlign: 'center'}}>
-        <Box sx={{ height: '40vh', overflow: 'auto' }} component="div">
+        <Box ref={chatContainer} sx={{ height: '40vh', overflow: 'auto' }} component="div">
           {messages.map((message, index) => {
             if (message.type === 'message') {
-              return (
-                <Alert severity="info">
-                  <AlertTitle>{message.user}</AlertTitle>
-                  {message.text}
-                </Alert>
-              )
+              if (message.user === user) {
+                return (
+                  <Alert severity="info" icon={false}>
+                    <AlertTitle>{message.user}</AlertTitle>
+                    {message.text}
+                  </Alert>
+                )
+              } else {
+                return (
+                  <Alert severity="warning" icon={false}>
+                    <AlertTitle>{message.user}</AlertTitle>
+                    {message.text}
+                  </Alert>
+                )
+              }
             } else if (message.type === 'winner') {
               return (
-                <Alert severity="success">{message.user} {message.text}!</Alert>
+                <Alert severity="success">{message.user} {message.text}</Alert>
               )
             }
           })}
