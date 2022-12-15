@@ -1,6 +1,6 @@
 > Given a 2 day timebox, write an application of your choosing
 
-# ouronlygameisroulette
+# websocket-roulette
 
 A collaborative Roulette application using WebSocket. Users are able to place multiple bets on a roulette wheel that is synchronized with all connected clients. Users are also able to interact with eachother through a chatbox.
 
